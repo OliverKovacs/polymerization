@@ -1,0 +1,175 @@
+<!--Oliver Kovacs 2022 MIT-->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>
+        Polymerization
+    </title>
+    <script>
+        const f = () => {
+            const k_ini = +document.querySelector("#k_ini").value;
+            const k_w =  +document.querySelector("#k_w").value;
+            const k_stop =  +document.querySelector("#k_stop").value;
+            const f = +document.querySelector("#f").value;
+
+            let I =  +document.querySelector("#I").value;
+            let M =  +document.querySelector("#M").value;
+            let P_star =  +document.querySelector("#P_star").value;
+
+            let I_arr = [ I ];
+            let M_arr = [ M ];
+            let P_star_arr = [ P_star ];
+
+            for (let i = 1; i < 10 || M_arr[i - 1] > 1e12 * Number.EPSILON && i < 5000; i++) {
+                I_arr[i] = I_arr[i - 1] - k_ini * I_arr[i - 1];
+                M_arr[i] = M_arr[i - 1] - k_w * M_arr[i - 1] * P_star_arr[i - 1];
+                P_star_arr[i] = P_star_arr[i - 1] - k_stop * Math.pow(P_star_arr[i - 1], 2)
+                P_star_arr[i] += 2 * f * k_ini * I_arr[i - 1];
+            }
+            
+            new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                theme: "light2",
+                title:{
+                    text: "Chain-Growth Polymerization",
+                },
+                toolTip: {
+                    shared: true,
+                },
+                data: [
+                    {
+                        type: "line",
+                        name: "[I]",
+                        showInLegend: true,
+                        markersize: 0,
+                        dataPoints: I_arr.map(y => { return { y } }),
+
+                    },
+                    {
+                        type: "line",
+                        name: "[M]",
+                        showInLegend: true,
+                        markersize: 0,
+                        dataPoints: M_arr.map(y => { return { y } }),
+
+                    },
+                    {
+                        type: "line",
+                        name: "[P*]",
+                        showInLegend: true,
+                        markersize: 0,
+                        dataPoints: P_star_arr.map(y => { return { y } }),
+
+                    },
+                ],
+            })
+            .render();
+
+            new CanvasJS
+                .Chart("chartContainer1", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title:{
+                        text: "Initiator",
+                    },
+                    axisY: {
+                        minimum: 0,
+                    },
+                    toolTip: {
+                        shared: true,
+                    },
+                    data: [
+                        {
+                            type: "line",
+                            name: "[I]",
+                            showInLegend: true,
+                            markersize: 0,
+                            dataPoints: I_arr.map(y => { return { y } }),
+                        },
+                    ],
+                })
+                .render();
+
+            new CanvasJS
+                .Chart("chartContainer2", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title:{
+                        text: "Monomers",
+                    },
+                    axisY: {
+                        minimum: 0,
+                    },
+                    toolTip: {
+                        shared: true,
+                    },
+                    data: [
+                        {
+                            type: "line",
+                            name: "[M]",
+                            showInLegend: true,
+                            markersize: 0,
+                            dataPoints: M_arr.map(y => { return { y } }),
+                        },
+                    ],
+                })
+                .render();
+
+            new CanvasJS
+                .Chart("chartContainer3", {
+                    animationEnabled: true,
+                    theme: "light2",
+                    title:{
+                        text: "Polymer Radicals",
+                    },
+                    axisY: {
+                        minimum: 0,
+                    },
+                    toolTip: {
+                        shared: true,
+                    },
+                    data: [
+                        {
+                            type: "line",
+                            name: "[P*]",
+                            showInLegend: true,
+                            markersize: 0,
+                            dataPoints: P_star_arr.map(y => { return { y } }),
+                        },
+                    ],
+                })
+                .render();
+
+        }
+
+        window.onload = () => {
+            document.querySelector("#button").onclick = f;
+            f();
+        };
+
+    </script>
+</head>
+<body>
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div id="chartContainer1" style="height: 370px; width: 33%; display: inline-block"></div>
+<div id="chartContainer2" style="height: 370px; width: 33%; display: inline-block"></div>
+<div id="chartContainer3" style="height: 370px; width: 33%; display: inline-block"></div>
+<label for="k_ini"><i>k</i><sub>ini</sub> :</label>
+<input type="text" id="k_ini" name="fname" value="0.005"><br>
+<label for="k_w"><i>k</i><sub>w</sub> :</label>
+<input type="text" id="k_w" name="fname" value="0.05"><br>
+<label for="k_stop"><i>k</i><sub>stop</sub> :</label>
+<input type="text" id="k_stop" name="fname" value="0.0005"><br>
+<label for="f"><i>f</i><sub></sub> :</label>
+<input type="text" id="f" name="fname" value="0.5"><br>
+
+<label for="I">[<i>I</i>]<sub>0</sub> :</label>
+<input type="text" id="I" name="fname" value="0.1"><br>
+<label for="M">[<i>M</i>]<sub>0</sub> :</label>
+<input type="text" id="M" name="fname" value="0.9"><br>
+<label for="P_star">[<i>P*</i>]<sub>0</sub> :</label>
+<input type="text" id="P_star" name="fname" value="0"><br>
+<button id="button">Calculate</button>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+</html>
